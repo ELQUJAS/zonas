@@ -43,20 +43,8 @@
     <script src="data/zonas_2.js"></script>
     <script>
     /* --- CÓDIGO MODIFICADO AQUÍ --- */
-    // 1. Se define una paleta de colores rojos
-    var redPalette = ['#ffe5e5', '#ffcccc', '#ff9999', '#ff6666', '#ff3333', '#ff0000', '#cc0000', '#990000', '#660000', '#330000'];
-
-    // 2. Se asocia cada zona a un color (basado en el índice de la zona)
-    var zonaColorMap = {};
-    if (typeof json_zonas_2 !== 'undefined') {
-        json_zonas_2.features.forEach(function(feature, index) {
-            var zonaName = feature.properties['Zona'];
-            if (zonaName) {
-                // Se asigna un color de la paleta, usando el operador módulo (%) para repetir los colores si hay más zonas que colores
-                zonaColorMap[zonaName] = redPalette[index % redPalette.length];
-            }
-        });
-    }
+    // 1. Se define una paleta de colores rojos para los polígonos
+    var redPalettePolygons = ['#ffe5e5', '#ffcccc', '#ff9999', '#ff6666', '#ff3333', '#ff0000', '#cc0000', '#990000', '#660000', '#330000'];
 
     // Se elimina el fitBounds inicial con coordenadas fijas.
     var map = L.map('map', {
@@ -140,22 +128,23 @@
     map.addLayer(layer_EsriSatellite_1);
 
     /* --- CÓDIGO MODIFICADO AQUÍ --- */
-    // La función del pop-up ahora usa el mapa de colores.
+    // La función del pop-up ahora solo tiene el texto en negrita y mayúsculas.
     function pop_zonas_2(feature, layer) {
         var zonaName = feature.properties['Zona'];
-        var color = zonaColorMap[zonaName] || '#000000'; // Usa el color asignado o negro por defecto
-        
-        var popupContent = '<b><span style="color:' + color + ';">' + (zonaName !== null ? autolinker.link(zonaName.toLocaleString()).toUpperCase() : '').trim() + '</span></b>';
-
+        var popupContent = '<b>' + (zonaName !== null ? autolinker.link(zonaName.toLocaleString()).toUpperCase() : '').trim() + '</b>';
         var content = removeEmptyRowsFromPopupContent(popupContent, feature);
-		layer.on('popupopen', function(e) {
-			addClassToPopupIfMedia(content, e.popup);
-		});
-		layer.bindPopup(content, { maxHeight: 400 });
+        layer.on('popupopen', function(e) {
+            addClassToPopupIfMedia(content, e.popup);
+        });
+        layer.bindPopup(content, { maxHeight: 400 });
     }
-    /* --- FIN DEL CÓDIGO MODIFICADO --- */
 
-    function style_zonas_2_0() {
+    // La función de estilo ahora asigna colores de relleno de la paleta de rojos.
+    function style_zonas_2_0(feature) {
+        // Se busca el índice de la característica en el GeoJSON para asignar un color
+        var index = json_zonas_2.features.indexOf(feature);
+        var fillColor = redPalettePolygons && redPalettePolygons.length > 0 ? redPalettePolygons[index % redPalettePolygons.length] : 'rgba(255,245,240,0.705)';
+
         return {
             pane: 'pane_zonas_2',
             opacity: 1,
@@ -165,11 +154,13 @@
             lineJoin: 'miter',
             weight: 1.0,
             fill: true,
-            fillOpacity: 1,
-            fillColor: 'rgba(255,245,240,0.705)',
+            fillOpacity: 0.705, // Mantén la opacidad si lo deseas
+            fillColor: fillColor,
             interactive: true,
         }
     }
+    /* --- FIN DEL CÓDIGO MODIFICADO --- */
+
     map.createPane('pane_zonas_2');
     map.getPane('pane_zonas_2').style.zIndex = 402;
     map.getPane('pane_zonas_2').style['mix-blend-mode'] = 'normal';
@@ -193,9 +184,7 @@
         {label: '<img src="legend/zonas_2.png" /> zonas', layer: layer_zonas_2},
     ];
     var lay = L.control.layers.tree(baseTree, overlaysTree,{
-        // --- CÓDIGO MODIFICADO AQUÍ ---
-        collapsed: false, // Cambiado a 'false' para que la leyenda se mantenga abierta
-        // --- FIN DEL CÓDIGO MODIFICADO ---
+        collapsed: false, // Se mantiene la leyenda
     });
     lay.addTo(map);
 
