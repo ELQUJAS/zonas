@@ -36,10 +36,10 @@
         line-height: 1.4;
         min-width: 250px;
     }
-    /* --- CÓDIGO MODIFICADO AQUÍ --- */
+    /* --- CÓDIGO MODIFICADO PARA DESPLAZAR EL BUSCADOR --- */
     #coordinate-search-box {
         position: absolute;
-        top: 120px; /* Desplazado 60px más abajo (de 60px a 120px) */
+        top: 160px; /* Desplazado 1 cm (aprox. 40px) más abajo */
         left: 10px;
         z-index: 1000;
         background-color: rgba(255, 255, 255, 0.8);
@@ -76,7 +76,7 @@
         Lat/Lon:
     </div>
     <div id="coordinate-search-box">
-        <input type="text" id="coord-input" placeholder="Ej: -39.300633, -72.292388">
+        <input type="text" id="coord-input" placeholder="Ej: -39.300633 -72.292388">
         <button id="coord-button">Ir</button>
     </div>
 
@@ -244,22 +244,27 @@
         coordsDisplay.innerHTML = `Lat/Lon: ${lat}, ${lon}`;
     });
 
+    /* --- CÓDIGO MODIFICADO PARA RECONOCER ESPACIOS Y COMAS --- */
     var coordInput = document.getElementById('coord-input');
     var coordButton = document.getElementById('coord-button');
 
     coordButton.addEventListener('click', function() {
-        var inputVal = coordInput.value;
-        var coordsArray = inputVal.split(',').map(coord => parseFloat(coord.trim()));
+        var inputVal = coordInput.value.trim();
+        // Dividir la cadena por uno o más espacios o comas
+        var coordsArray = inputVal.split(/[\s,]+/).map(coord => parseFloat(coord));
 
+        // Validar que se hayan ingresado dos números válidos
         if (coordsArray.length === 2 && !isNaN(coordsArray[0]) && !isNaN(coordsArray[1])) {
             var lat = coordsArray[0];
             var lon = coordsArray[1];
             
+            // Centrar el mapa en las coordenadas y hacer zoom
             map.setView([lat, lon], 15);
         } else {
-            alert('Por favor, introduce las coordenadas en el formato correcto: latitud, longitud (ej: -39.300633, -72.292388)');
+            alert('Por favor, introduce las coordenadas en el formato correcto (ej: -39.300633 -72.292388)');
         }
     });
+    /* --- FIN DEL CÓDIGO MODIFICADO --- */
     </script>
 </body>
 </html>
