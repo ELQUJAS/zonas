@@ -78,13 +78,13 @@
 
     /* Estilos para las etiquetas de las zonas */
     .zone-label {
-        font-weight: bold;
-        font-size: 12px; /* Ajusta el tamaño de la fuente si es necesario */
+        font-weight: bold; /* Aseguramos que sea negrita */
+        font-size: 12px;
         text-align: center;
-        white-space: nowrap; /* Evita que el texto se rompa en varias líneas */
-        color: #333; /* Color del texto de la etiqueta */
-        text-shadow: 1px 1px 2px rgba(255,255,255,0.7); /* Sombra para mejorar la legibilidad */
-        pointer-events: none; /* Asegura que la etiqueta no bloquee eventos del mapa */
+        white-space: nowrap;
+        color: #333;
+        text-shadow: 1px 1px 2px rgba(255,255,255,0.7);
+        pointer-events: none;
     }
     </style>
     <title></title>
@@ -211,11 +211,11 @@
         return {
             pane: 'pane_zonas_2',
             opacity: 0.6,
-            color: 'rgba(0,0,255,0.8)', // Color azul para el borde
-            dashArray: '5, 5',         // Línea punteada (5px de línea, 5px de espacio)
+            color: 'rgba(0,0,255,0.8)',
+            dashArray: '5, 5',
             lineCap: 'butt',
             lineJoin: 'miter',
-            weight: 2.0,               // Un poco más de grosor para que se vea bien
+            weight: 2.0,
             fill: true,
             fillOpacity: 0.6,
             fillColor: fillColor,
@@ -238,7 +238,7 @@
     bounds_group.addLayer(layer_zonas_2);
     map.addLayer(layer_zonas_2);
 
-    // --- NUEVA CAPA PARA ETIQUETAS DE ZONAS ---
+    // --- NUEVA CAPA PARA ETIQUETAS DE ZONAS (AHORA SIEMPRE VISIBLE) ---
     var layer_zonas_2_labels = new L.featureGroup();
     layer_zonas_2.eachLayer(function(layer) {
         var centroid = layer.getBounds().getCenter();
@@ -247,18 +247,18 @@
         if (zonaName) {
             var labelIcon = L.divIcon({
                 className: 'zone-label',
-                html: '<div>' + zonaName + '</div>', // Mostrar el nombre de la zona
-                iconAnchor: [0, 0] // Centrar el icono en el marcador
+                html: '<div>' + zonaName + '</div>',
+                iconAnchor: [0, 0]
             });
 
             var labelMarker = L.marker(centroid, {
                 icon: labelIcon,
-                interactive: false, // Las etiquetas no deben ser interactivas
-                pane: 'pane_zonas_2' // Asegura que las etiquetas estén en el mismo panel o superior
-            }).addTo(layer_zonas_2_labels); // Añadir al grupo de etiquetas
+                interactive: false,
+                pane: 'pane_zonas_2'
+            }).addTo(layer_zonas_2_labels);
         }
     });
-    // map.addLayer(layer_zonas_2_labels); // Se añade a través del control de capas
+    map.addLayer(layer_zonas_2_labels); // Añadir la capa de etiquetas directamente al mapa
 
     var baseMaps = {};
     var baseTree = [
@@ -267,7 +267,7 @@
     ];
     var overlaysTree = [
         {label: '<img src="legend/zonas_2.png" /> zonas', layer: layer_zonas_2},
-        {label: 'Nombres de Zonas', layer: layer_zonas_2_labels} // Añadir la capa de etiquetas al control
+        // {label: 'Nombres de Zonas', layer: layer_zonas_2_labels} // <-- Eliminada del control de capas
     ];
     var lay = L.control.layers.tree(baseTree, overlaysTree,{
         collapsed: false,
