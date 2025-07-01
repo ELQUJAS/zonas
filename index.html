@@ -22,7 +22,6 @@
         font-size: 1.3em;
     }
 
-    /* --- CÓDIGO AÑADIDO PARA EL RECUADRO DE COORDENADAS --- */
     #coordinate-display {
         position: absolute;
         bottom: 10px;
@@ -37,7 +36,6 @@
         line-height: 1.4;
         min-width: 250px;
     }
-    /* --- FIN DEL CÓDIGO AÑADIDO --- */
     </style>
     <title></title>
 </head>
@@ -46,6 +44,7 @@
     <div id="coordinate-display">
         Lat/Lon:
     </div>
+
     <script src="js/qgis2web_expressions.js"></script>
     <script src="js/leaflet.js"></script>
     <script src="js/L.Control.Layers.Tree.min.js"></script>
@@ -192,27 +191,27 @@
 
     setBounds();
 
+    /* --- CÓDIGO MODIFICADO AQUÍ --- */
     map.addControl(new L.Control.Search({
         layer: layer_zonas_2,
         initial: false,
         hideMarkerOnCollapse: true,
         propertyName: 'Zona',
-        zoom: 15
+        zoom: 15,
+        // --- LÍNEA AÑADIDA ---
+        textPlaceholder: 'Nombre Zona'
+        // --- FIN DE LA LÍNEA AÑADIDA ---
     }));
+    /* --- FIN DEL CÓDIGO MODIFICADO --- */
     document.getElementsByClassName('search-button')[0].className += ' fa fa-binoculars';
 
-    /* --- CÓDIGO AÑADIDO PARA MOSTRAR SOLO LAT/LON --- */
     var coordsDisplay = document.getElementById('coordinate-display');
     
     map.on('mousemove', function(e) {
-        // Coordenadas Lat/Lon, con 6 decimales
         var lat = e.latlng.lat.toFixed(6);
         var lon = e.latlng.lng.toFixed(6);
-
-        // Actualizar el contenido del div
         coordsDisplay.innerHTML = `Lat/Lon: ${lat}, ${lon}`;
     });
-    /* --- FIN DEL CÓDIGO AÑADIDO --- */
     </script>
 </body>
 </html>
