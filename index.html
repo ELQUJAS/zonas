@@ -147,19 +147,15 @@
 
         return {
             pane: 'pane_zonas_2',
-            // --- CÓDIGO MODIFICADO AQUÍ ---
-            // Se cambia la opacidad para que la capa sea 40% transparente (60% opaca).
-            opacity: 0.6, // Opacidad del borde del polígono
-            color: 'rgba(35,35,35,0.6)', // Opacidad del color del borde
-            // --- FIN DEL CÓDIGO MODIFICADO ---
+            // Se mantiene la opacidad al 60% (40% de transparencia).
+            opacity: 0.6,
+            color: 'rgba(35,35,35,0.6)',
             dashArray: '',
             lineCap: 'butt',
             lineJoin: 'miter',
             weight: 1.0,
             fill: true,
-            // --- CÓDIGO MODIFICADO AQUÍ ---
-            fillOpacity: 0.6, // Opacidad del relleno del polígono
-            // --- FIN DEL CÓDIGO MODIFICADO ---
+            fillOpacity: 0.6,
             fillColor: fillColor,
             interactive: true,
         }
@@ -202,7 +198,11 @@
         layer: layer_zonas_2,
         initial: false,
         hideMarkerOnCollapse: true,
-        propertyName: 'Zona'}));
+        propertyName: 'Zona',
+        // --- CÓDIGO AÑADIDO AQUÍ ---
+        zoom: 15 // Esto hace un zoom al nivel 15 cuando se selecciona una zona en el buscador
+        // --- FIN DEL CÓDIGO AÑADIDO ---
+    }));
     document.getElementsByClassName('search-button')[0].className +=
       ' fa fa-binoculars';
     </script>
