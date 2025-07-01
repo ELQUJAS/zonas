@@ -37,9 +37,13 @@
         <script src="js/leaflet-search.js"></script>
         <script src="data/zonas_2.js"></script>
         <script>
+        // --- CÓDIGO MODIFICADO AQUÍ ---
+        // Se elimina el fitBounds inicial con coordenadas fijas.
         var map = L.map('map', {
             zoomControl:false, maxZoom:28, minZoom:1
-        }).fitBounds([[-39.546780251638964,-72.72924380095134],[-38.97515564947169,-71.61677776834237]]);
+        });
+        // --- FIN DEL CÓDIGO MODIFICADO ---
+
         var hash = new L.Hash(map);
         map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
         var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
@@ -75,8 +79,19 @@
             position: 'topleft'
         }).addTo(map);
         var bounds_group = new L.featureGroup([]);
+        
+        // --- CÓDIGO MODIFICADO AQUÍ ---
+        // Ahora esta función obtiene los límites de la capa y hace zoom a ellos.
         function setBounds() {
+            // Obtenemos los límites de la capa 'zonas'
+            var bounds = layer_zonas_2.getBounds();
+            // Verificamos que los límites sean válidos antes de hacer zoom
+            if (bounds.isValid()) {
+                map.fitBounds(bounds);
+            }
         }
+        // --- FIN DEL CÓDIGO MODIFICADO ---
+
         map.createPane('pane_OpenStreetMap_0');
         map.getPane('pane_OpenStreetMap_0').style.zIndex = 400;
         var layer_OpenStreetMap_0 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -141,29 +156,24 @@
         });
         bounds_group.addLayer(layer_zonas_2);
         map.addLayer(layer_zonas_2);
-
-        // --- CÓDIGO MODIFICADO AQUÍ PARA SEPARAR LOS MAPAS BASE ---
-        
-        // Define los mapas base
+        var baseMaps = {};
         var baseTree = [
             {label: "OpenStreetMap", layer: layer_OpenStreetMap_0},
             {label: "Esri Satellite", layer: layer_EsriSatellite_1},
         ];
-
-        // Define las capas superpuestas
         var overlaysTree = [
             {label: '<img src="legend/zonas_2.png" /> zonas', layer: layer_zonas_2},
         ];
-        
-        // Crea el control de capas con las dos secciones
         var lay = L.control.layers.tree(baseTree, overlaysTree,{
             collapsed: true,
         });
+        lay.addTo(map);
         
+        // --- CÓDIGO MODIFICADO AQUÍ ---
+        // Ahora, esta llamada ejecutará la función que hace zoom a la capa de zonas.
+        setBounds(); 
         // --- FIN DEL CÓDIGO MODIFICADO ---
 
-        lay.addTo(map);
-        setBounds();
         map.addControl(new L.Control.Search({
             layer: layer_zonas_2,
             initial: false,
