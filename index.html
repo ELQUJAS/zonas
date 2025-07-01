@@ -25,9 +25,9 @@
     /* --- CÓDIGO AÑADIDO PARA EL RECUADRO DE COORDENADAS --- */
     #coordinate-display {
         position: absolute;
-        bottom: 10px; /* Posiciona desde abajo */
-        left: 10px; /* Posiciona desde la izquierda */
-        z-index: 1000; /* Asegura que esté encima de todo */
+        bottom: 10px;
+        left: 10px;
+        z-index: 1000;
         background-color: rgba(255, 255, 255, 0.8);
         padding: 8px;
         border-radius: 5px;
@@ -35,7 +35,7 @@
         font-size: 14px;
         color: #333;
         line-height: 1.4;
-        min-width: 250px; /* Ancho mínimo para que no se vea cortado */
+        min-width: 250px;
     }
     /* --- FIN DEL CÓDIGO AÑADIDO --- */
     </style>
@@ -46,6 +46,7 @@
     <div id="coordinate-display">
         Lat/Lon: <br>
         UTM: <br>
+        Zona/Uso: <br>
     </div>
     <script src="js/qgis2web_expressions.js"></script>
     <script src="js/leaflet.js"></script>
@@ -204,26 +205,33 @@
     }));
     document.getElementsByClassName('search-button')[0].className += ' fa fa-binoculars';
 
-    /* --- CÓDIGO AÑADIDO PARA MOSTRAR COORDENADAS --- */
+    /* --- CÓDIGO MODIFICADO PARA MOSTRAR COORDENADAS CON ZONA/USO --- */
     var coordsDisplay = document.getElementById('coordinate-display');
-    var isUTMEnabled = true; // Variable para habilitar/deshabilitar UTM
-
+    
     map.on('mousemove', function(e) {
-        // Coordenadas Lat/Lon
+        // Coordenadas Lat/Lon, con 6 decimales para mayor precisión
         var lat = e.latlng.lat.toFixed(6);
         var lon = e.latlng.lng.toFixed(6);
 
-        // Coordenadas UTM (si el plugin está disponible)
-        var utmCoords = '';
+        // Coordenadas UTM y Zona/Uso
+        var utmDisplay = '';
         if (typeof L.latLng !== 'undefined' && L.latLng(lat, lon).utm) {
             var utm = L.latLng(lat, lon).utm();
-            utmCoords = utm.toString({ format: '{x} {y} {zone}{band}' });
+            // Formatear las coordenadas UTM a 2 decimales
+            var easting = utm.easting.toFixed(2);
+            var northing = utm.northing.toFixed(2);
+            // Combinar zona y banda para el "uso"
+            var utmZone = `${utm.zone}${utm.band}`;
+            
+            utmDisplay = `UTM: E: ${easting}, N: ${northing}<br>Zona/Uso: ${utmZone}`;
+        } else {
+            utmDisplay = 'UTM: No disponible'; // Mensaje de fallback si no se pueden calcular
         }
 
         // Actualizar el contenido del div
-        coordsDisplay.innerHTML = `Lat/Lon: ${lat}, ${lon}<br>UTM: ${utmCoords}`;
+        coordsDisplay.innerHTML = `Lat/Lon: ${lat}, ${lon}<br>${utmDisplay}`;
     });
-    /* --- FIN DEL CÓDIGO AÑADIDO --- */
+    /* --- FIN DEL CÓDIGO MODIFICADO --- */
     </script>
 </body>
 </html>
