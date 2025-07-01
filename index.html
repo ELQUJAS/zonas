@@ -45,12 +45,11 @@
         line-height: 1.4;
         min-width: 250px;
     }
-    /* --- CÓDIGO MODIFICADO PARA REUBICAR EL BUSCADOR --- */
     #coordinate-search-box {
         position: absolute;
-        top: 150px;  /* Ajustado para que quede debajo de la leyenda */
-        left: auto;   /* Desactivar posicionamiento izquierdo */
-        right: 10px;  /* Anclado a la derecha */
+        top: 150px;
+        left: auto;
+        right: 10px;
         z-index: 1000;
         background-color: rgba(255, 255, 255, 0.8);
         padding: 8px;
@@ -61,7 +60,6 @@
         gap: 5px;
         align-items: center;
     }
-    /* --- FIN DEL CÓDIGO MODIFICADO --- */
     #coordinate-search-box input {
         border: 1px solid #ccc;
         padding: 5px;
@@ -144,12 +142,17 @@
     }).addTo(map);
     var bounds_group = new L.featureGroup([]);
 
+    // --- FUNCIÓN MODIFICADA PARA UN ZOOM MÁS CERCANO ---
     function setBounds() {
         var bounds = layer_zonas_2.getBounds();
         if (bounds.isValid()) {
-            map.fitBounds(bounds);
+            // Se usa fitBounds con la opción 'padding' para hacer un zoom más cercano
+            map.fitBounds(bounds, {
+                padding: [50, 50] // Ajusta este valor en píxeles para cambiar el margen del zoom
+            });
         }
     }
+    // --- FIN DE LA FUNCIÓN MODIFICADA ---
 
     map.createPane('pane_OpenStreetMap_0');
     map.getPane('pane_OpenStreetMap_0').style.zIndex = 400;
