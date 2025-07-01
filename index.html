@@ -122,6 +122,8 @@
     <script src="js/leaflet-search.js"></script>
     <script src="data/zonas_2.js"></script>
     <script>
+    // La paleta de colores ya no se usará para el relleno de los polígonos,
+    // pero se mantiene por si se necesita para otros propósitos.
     var redPalettePolygons = ['#FFFBE6', '#FFF8CC', '#FFF5B3', '#FFF299', '#FFEF80', '#FFE64D', '#FFD900', '#FFCC00', '#E6B800', '#CCA300'];
     var map = L.map('map', {
         zoomControl:false, maxZoom:28, minZoom:1
@@ -212,20 +214,20 @@
     }
 
     function style_zonas_2_0(feature) {
-        var index = json_zonas_2.features.indexOf(feature);
-        var fillColor = redPalettePolygons && redPalettePolygons.length > 0 ? redPalettePolygons[index % redPalettePolygons.length] : 'rgba(255,245,240,0.6)';
+        // Se ha cambiado el fillColor para que todas las zonas tengan el mismo color
+        var singleFillColor = '#FFF8CC'; // Un amarillo suave consistente
 
         return {
             pane: 'pane_zonas_2',
             opacity: 0.6,
-            color: 'rgba(0,0,255,0.8)',
+            color: 'rgba(0,0,255,0.8)', // Borde azul punteado
             dashArray: '5, 5',
             lineCap: 'butt',
             lineJoin: 'miter',
             weight: 2.0,
             fill: true,
             fillOpacity: 0.6,
-            fillColor: fillColor,
+            fillColor: singleFillColor, // Todas las zonas con este color
             interactive: true,
         }
     }
@@ -273,7 +275,7 @@
         {label: "Esri Satellite", layer: layer_EsriSatellite_1},
     ];
     var overlaysTree = [
-        {label: '<img src="legend/zonas_2.png" /> zonas', layer: layer_zonas_2}, // ¡Leyenda restaurada aquí!
+        {label: '<img src="legend/zonas_2.png" /> zonas', layer: layer_zonas_2}, // Leyenda restaurada
     ];
     var lay = L.control.layers.tree(baseTree, overlaysTree,{
         collapsed: false,
@@ -334,4 +336,5 @@
     </script>
 </body>
 </html>
+
 
