@@ -75,6 +75,17 @@
         cursor: pointer;
         font-size: 14px;
     }
+
+    /* Estilos para las etiquetas de las zonas */
+    .zone-label {
+        font-weight: bold;
+        font-size: 12px; /* Ajusta el tamaño de la fuente si es necesario */
+        text-align: center;
+        white-space: nowrap; /* Evita que el texto se rompa en varias líneas */
+        color: #333; /* Color del texto de la etiqueta */
+        text-shadow: 1px 1px 2px rgba(255,255,255,0.7); /* Sombra para mejorar la legibilidad */
+        pointer-events: none; /* Asegura que la etiqueta no bloquee eventos del mapa */
+    }
     </style>
     <title></title>
 </head>
@@ -226,6 +237,29 @@
     });
     bounds_group.addLayer(layer_zonas_2);
     map.addLayer(layer_zonas_2);
+
+    // --- NUEVA CAPA PARA ETIQUETAS DE ZONAS ---
+    var layer_zonas_2_labels = new L.featureGroup();
+    layer_zonas_2.eachLayer(function(layer) {
+        var centroid = layer.getBounds().getCenter();
+        var zonaName = layer.feature.properties['Zona'];
+
+        if (zonaName) {
+            var labelIcon = L.divIcon({
+                className: 'zone-label',
+                html: '<div>' + zonaName + '</div>', // Mostrar el nombre de la zona
+                iconAnchor: [0, 0] // Centrar el icono en el marcador
+            });
+
+            var labelMarker = L.marker(centroid, {
+                icon: labelIcon,
+                interactive: false, // Las etiquetas no deben ser interactivas
+                pane: 'pane_zonas_2' // Asegura que las etiquetas estén en el mismo panel o superior
+            }).addTo(layer_zonas_2_labels); // Añadir al grupo de etiquetas
+        }
+    });
+    // map.addLayer(layer_zonas_2_labels); // Se añade a través del control de capas
+
     var baseMaps = {};
     var baseTree = [
         {label: "OpenStreetMap", layer: layer_OpenStreetMap_0},
@@ -233,6 +267,7 @@
     ];
     var overlaysTree = [
         {label: '<img src="legend/zonas_2.png" /> zonas', layer: layer_zonas_2},
+        {label: 'Nombres de Zonas', layer: layer_zonas_2_labels} // Añadir la capa de etiquetas al control
     ];
     var lay = L.control.layers.tree(baseTree, overlaysTree,{
         collapsed: false,
