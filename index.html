@@ -200,14 +200,14 @@
 
         return {
             pane: 'pane_zonas_2',
-            opacity: 0.4, // Transparencia del 40%
-            color: 'rgba(0,0,255,0.8)', // Borde azul punteado
+            opacity: 0.4, // Transparencia del 40% para la capa completa (incluyendo borde y relleno)
+            color: 'rgba(0,0,255,1.0)', // Borde azul sin transparencia (opacidad 100%)
             dashArray: '5, 5',
             lineCap: 'butt',
             lineJoin: 'miter',
             weight: 2.0,
             fill: true,
-            fillOpacity: 0.4, // Transparencia del 40% para el relleno también
+            fillOpacity: 0.4, // Transparencia del 40% para el relleno
             fillColor: singleFillColor, // Todas las zonas con este color
             interactive: true,
         }
