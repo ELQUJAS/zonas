@@ -52,7 +52,7 @@
         right: 10px;
         z-index: 1000;
         background-color: rgba(255, 255, 255, 0.8);
-        : 8px;
+        padding: 8px;
         border-radius: 5px;
         font-family: sans-serif;
         font-size: 14px;
@@ -62,7 +62,7 @@
     }
     #coordinate-search-box input {
         border: 1px solid #ccc;
-        : 5px;
+        padding: 5px;
         border-radius: 3px;
         font-size: 14px;
     }
@@ -70,7 +70,7 @@
         background-color: #0078A8;
         color: white;
         border: none;
-        : 6px 10px;
+        padding: 6px 10px;
         border-radius: 3px;
         cursor: pointer;
         font-size: 14px;
@@ -101,7 +101,8 @@
     <script src="js/leaflet-search.js"></script>
     <script src="data/zonas_2.js"></script>
     <script>
-    var redPalettePolygons = ['#ffe5e5', '#ffcccc', '#ff9999', '#ff6666', '#ff3333', '#ff0000', '#cc0000', '#990000', '#660000', '#330000'];
+    // PALETA DE COLORES MODIFICADA A AMARILLOS SUAVES
+    var redPalettePolygons = ['#FFFBE6', '#FFF8CC', '#FFF5B3', '#FFF299', '#FFEF80', '#FFE64D', '#FFD900', '#FFCC00', '#E6B800', '#CCA300'];
     var map = L.map('map', {
         zoomControl:false, maxZoom:28, minZoom:1
     });
@@ -111,31 +112,31 @@
     var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
     
     function removeEmptyRowsFromPopupContent(content, feature) {
-       var tempDiv = document.createElement('div');
-       tempDiv.innerHTML = content;
-       var rows = tempDiv.querySelectorAll('tr');
-       for (var i = 0; i < rows.length; i++) {
-           var td = rows.item(i).querySelector('td.visible-with-data');
-           var key = td ? td.id : '';
-           if (td && td.classList.contains('visible-with-data') && feature.properties.hasOwnProperty(key) && feature.properties.key == null) {
-               rows.item(i).parentNode.removeChild(rows.item(i));
-           }
-       }
-       return tempDiv.innerHTML;
+        var tempDiv = document.createElement('div');
+        tempDiv.innerHTML = content;
+        var rows = tempDiv.querySelectorAll('tr');
+        for (var i = 0; i < rows.length; i++) {
+            var td = rows.item(i).querySelector('td.visible-with-data');
+            var key = td ? td.id : '';
+            if (td && td.classList.contains('visible-with-data') && feature.properties.hasOwnProperty(key) && feature.properties.key == null) {
+                rows.item(i).parentNode.removeChild(rows.item(i));
+            }
+        }
+        return tempDiv.innerHTML;
     }
     
     function addClassToPopupIfMedia(content, popup) {
-		var tempDiv = document.createElement('div');
-		tempDiv.innerHTML = content;
-		if (tempDiv.querySelector('td img')) {
-			popup._contentNode.classList.add('media');
-				setTimeout(function() {
-					popup.update();
-				}, 10);
-		} else {
-			popup._contentNode.classList.remove('media');
-		}
-	}
+        var tempDiv = document.createElement('div');
+        tempDiv.innerHTML = content;
+        if (tempDiv.querySelector('td img')) {
+            popup._contentNode.classList.add('media');
+                setTimeout(function() {
+                    popup.update();
+                }, 10);
+        } else {
+            popup._contentNode.classList.remove('media');
+        }
+    }
     
     var zoomControl = L.control.zoom({
         position: 'topleft'
@@ -147,7 +148,7 @@
         var bounds = layer_zonas_2.getBounds();
         if (bounds.isValid()) {
             // map.fitBounds(bounds) ajusta el mapa a los límites de la capa.
-            // La opción '' agrega un margen alrededor de los límites,
+            // La opción 'padding' agrega un margen alrededor de los límites,
             // lo que resulta en un zoom más cercano.
             map.fitBounds(bounds, {
                 padding: [100, 100] // Aumenta este valor para un zoom más cercano, redúcelo para ver más del área circundante.
