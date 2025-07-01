@@ -150,8 +150,9 @@
     function setBounds() {
         var bounds = layer_zonas_2.getBounds();
         if (bounds.isValid()) {
+            // Se ha aumentado el padding para un zoom más cercano al cargar la página
             map.fitBounds(bounds, {
-                padding: [100, 100]
+                padding: [200, 200] // Valores aumentados para un zoom más cercano
             });
         }
     }
