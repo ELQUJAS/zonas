@@ -78,13 +78,31 @@
 
     /* Estilos para las etiquetas de las zonas */
     .zone-label {
-        font-weight: bold; /* Aseguramos que sea negrita */
-        font-size: 12px;
+        font-weight: bold;
+        font-size: 9px; /* Tamaño de fuente más pequeño */
         text-align: center;
         white-space: nowrap;
         color: #333;
         text-shadow: 1px 1px 2px rgba(255,255,255,0.7);
         pointer-events: none;
+        /* Asegurarse de que el icono no tenga padding/margin que lo desplace */
+        margin-left: 0 !important;
+        margin-top: 0 !important;
+    }
+    /* Estilos para que el marcador de la etiqueta se centre correctamente */
+    .leaflet-marker-icon.zone-label {
+        background: none !important; /* Eliminar el fondo por defecto si lo tiene */
+        border: none !important; /* Eliminar el borde por defecto si lo tiene */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        /* Asegurar que el tamaño del contenedor del divIcon no sea excesivo,
+           o que el div dentro de él se centre correctamente.
+           El tamaño del divIcon se maneja mejor por su contenido.
+        */
+    }
+    .leaflet-marker-icon.zone-label div {
+        transform: translate(-50%, -50%); /* Centrar el texto en el punto del marcador */
     }
     </style>
     <title></title>
@@ -157,11 +175,8 @@
     function setBounds() {
         var bounds = layer_zonas_2.getBounds();
         if (bounds.isValid()) {
-            // map.fitBounds(bounds) ajusta el mapa a los límites de la capa.
-            // La opción 'padding' agrega un margen alrededor de los límites,
-            // lo que resulta en un zoom más cercano.
             map.fitBounds(bounds, {
-                padding: [100, 100] // Aumenta este valor para un zoom más cercano, redúcelo para ver más del área circundante.
+                padding: [100, 100]
             });
         }
     }
@@ -238,27 +253,63 @@
     bounds_group.addLayer(layer_zonas_2);
     map.addLayer(layer_zonas_2);
 
-    // --- NUEVA CAPA PARA ETIQUETAS DE ZONAS (AHORA SIEMPRE VISIBLE) ---
-    var layer_zonas_2_labels = new L.featureGroup();
+    // --- INTEGRACIÓN DE LABELGUN PARA GESTIONAR LAS ETIQUETAS ---
+    var labelEngine = new labelGun(map); // Inicializa el motor de labelgun
+    var labelsArray = []; // Array para almacenar las etiquetas antes de pasarlas a labelgun
+
     layer_zonas_2.eachLayer(function(layer) {
-        var centroid = layer.getBounds().getCenter();
         var zonaName = layer.feature.properties['Zona'];
 
         if (zonaName) {
-            var labelIcon = L.divIcon({
-                className: 'zone-label',
-                html: '<div>' + zonaName + '</div>',
-                iconAnchor: [0, 0]
-            });
+            var labelDiv = L.DomUtil.create('div', 'zone-label'); // Crea el div de la etiqueta
+            labelDiv.innerHTML = zonaName;
 
-            var labelMarker = L.marker(centroid, {
-                icon: labelIcon,
-                interactive: false,
-                pane: 'pane_zonas_2'
-            }).addTo(layer_zonas_2_labels);
+            // Obtener el centroide y los límites del polígono en coordenadas de pantalla
+            var centroid = map.latLngToContainerPoint(layer.getBounds().getCenter());
+            var polygonBounds = layer.getBounds();
+            var polygonPixelBounds = L.bounds(
+                map.latLngToContainerPoint(polygonBounds.getNorthWest()),
+                map.latLngToContainerPoint(polygonBounds.getSouthEast())
+            );
+
+            // Calcular un rectángulo de "caja de impacto" para el texto (aproximado)
+            // Necesitamos una estimación del tamaño del texto.
+            // Para una estimación más precisa, se necesitaría medir el texto en el DOM.
+            // Por ahora, asumiremos un tamaño fijo para la "caja" del texto.
+            var textWidth = zonaName.length * 5; // Aprox. 5px por caracter para font-size 9px
+            var textHeight = 15; // Aprox. la altura de la línea
+
+            var labelX = centroid.x - (textWidth / 2);
+            var labelY = centroid.y - (textHeight / 2);
+
+            var labelBbox = new L.Bounds(
+                L.point(labelX, labelY),
+                L.point(labelX + textWidth, labelY + textHeight)
+            );
+
+            labelsArray.push({
+                layer: layer, // La capa Leaflet asociada (el polígono)
+                bbox: labelBbox, // La caja de impacto de la etiqueta en píxeles de pantalla
+                text: labelDiv, // El elemento DOM de la etiqueta
+                originalPosition: centroid, // Posición original (centroide)
+                polygon: layer // Referencia al polígono original para chequeo de contención
+            });
         }
     });
-    map.addLayer(layer_zonas_2_labels); // Añadir la capa de etiquetas directamente al mapa
+
+    // Añadir todas las etiquetas al motor de labelgun y procesarlas
+    labelEngine.addLabels(labelsArray);
+
+    // Función para actualizar las etiquetas cuando el mapa se mueve o hace zoom
+    function updateLabels() {
+        labelEngine.update(); // Recalcula la colocación de las etiquetas
+    }
+
+    map.on('moveend', updateLabels); // Actualiza las etiquetas al final del movimiento/zoom
+    map.on('zoomend', updateLabels); // Actualiza las etiquetas al final del zoom
+
+    // Llamar a updateLabels una vez al inicio para la primera visualización
+    updateLabels();
 
     var baseMaps = {};
     var baseTree = [
@@ -267,14 +318,13 @@
     ];
     var overlaysTree = [
         {label: '<img src="legend/zonas_2.png" /> zonas', layer: layer_zonas_2},
-        // {label: 'Nombres de Zonas', layer: layer_zonas_2_labels} // <-- Eliminada del control de capas
     ];
     var lay = L.control.layers.tree(baseTree, overlaysTree,{
         collapsed: false,
     });
     lay.addTo(map);
 
-    setBounds();
+    setBounds(); // Llama a setBounds después de que las capas estén cargadas
 
     map.addControl(new L.Control.Search({
         layer: layer_zonas_2,
