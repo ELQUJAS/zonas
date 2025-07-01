@@ -1,3 +1,14 @@
+¡Entendido! Quieres que el texto dentro de las ventanas emergentes (pop-ups) aparezca EN MAYÚSCULAS Y EN NEGRITA.
+
+Para hacer esto, vamos a modificar la línea donde se define el contenido del pop-up dentro de la función pop_zonas_2. Utilizaremos etiquetas HTML para aplicar el formato de negrita (<b>) y la función toUpperCase() de JavaScript para convertir el texto a mayúsculas.
+
+Aquí tienes el código HTML completo con esta modificación aplicada:
+
+Código Completo con Pop-ups en Mayúsculas y Negrita
+Copia y pega este código en tu archivo HTML.
+
+HTML
+
 <!doctype html>
 <html lang="en">
     <head>
@@ -53,10 +64,10 @@
            tempDiv.innerHTML = content;
            var rows = tempDiv.querySelectorAll('tr');
            for (var i = 0; i < rows.length; i++) {
-               var td = rows[i].querySelector('td.visible-with-data');
+               var td = rows.item(i).querySelector('td.visible-with-data');
                var key = td ? td.id : '';
-               if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
-                   rows[i].parentNode.removeChild(rows[i]);
+               if (td && td.classList.contains('visible-with-data') && feature.properties.hasOwnProperty(key) && feature.properties.key == null) {
+                   rows.item(i).parentNode.removeChild(rows.item(i));
                }
            }
            return tempDiv.innerHTML;
@@ -79,7 +90,7 @@
             position: 'topleft'
         }).addTo(map);
         var bounds_group = new L.featureGroup([]);
-        
+
         // --- CÓDIGO MODIFICADO AQUÍ ---
         // Ahora esta función obtiene los límites de la capa y hace zoom a ellos.
         function setBounds() {
@@ -119,7 +130,9 @@
         layer_EsriSatellite_1;
         map.addLayer(layer_EsriSatellite_1);
         function pop_zonas_2(feature, layer) {
-            var popupContent = 'Zona: ' + (feature.properties['Zona'] !== null ? autolinker.link(feature.properties['Zona'].toLocaleString()) : '');
+            // --- CÓDIGO MODIFICADO AQUÍ PARA MAYÚSCULAS Y NEGRITA ---
+            var popupContent = '<b>' + (feature.properties['Zona'] !== null ? autolinker.link(feature.properties['Zona'].toLocaleString()).toUpperCase() : '').trim() + '</b>';
+            // --- FIN DEL CÓDIGO MODIFICADO ---
             var content = removeEmptyRowsFromPopupContent(popupContent, feature);
 			layer.on('popupopen', function(e) {
 				addClassToPopupIfMedia(content, e.popup);
@@ -168,10 +181,10 @@
             collapsed: true,
         });
         lay.addTo(map);
-        
+
         // --- CÓDIGO MODIFICADO AQUÍ ---
         // Ahora, esta llamada ejecutará la función que hace zoom a la capa de zonas.
-        setBounds(); 
+        setBounds();
         // --- FIN DEL CÓDIGO MODIFICADO ---
 
         map.addControl(new L.Control.Search({
