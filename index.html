@@ -22,7 +22,6 @@
         font-size: 1.3em;
     }
 
-    /* --- CÓDIGO AÑADIDO PARA EL RECUADRO DE COORDENADAS --- */
     #coordinate-display {
         position: absolute;
         bottom: 10px;
@@ -37,7 +36,6 @@
         line-height: 1.4;
         min-width: 250px;
     }
-    /* --- FIN DEL CÓDIGO AÑADIDO --- */
     </style>
     <title></title>
 </head>
@@ -48,6 +46,7 @@
         UTM: <br>
         Zona/Uso: <br>
     </div>
+
     <script src="js/qgis2web_expressions.js"></script>
     <script src="js/leaflet.js"></script>
     <script src="js/L.Control.Layers.Tree.min.js"></script>
@@ -63,7 +62,6 @@
     <script src="data/zonas_2.js"></script>
     <script>
     var redPalettePolygons = ['#ffe5e5', '#ffcccc', '#ff9999', '#ff6666', '#ff3333', '#ff0000', '#cc0000', '#990000', '#660000', '#330000'];
-
     var map = L.map('map', {
         zoomControl:false, maxZoom:28, minZoom:1
     });
@@ -205,7 +203,7 @@
     }));
     document.getElementsByClassName('search-button')[0].className += ' fa fa-binoculars';
 
-    /* --- CÓDIGO MODIFICADO PARA MOSTRAR COORDENADAS CON ZONA/USO --- */
+    /* --- CÓDIGO MODIFICADO PARA COMPROBAR SI EL PLUGIN CARGÓ --- */
     var coordsDisplay = document.getElementById('coordinate-display');
     
     map.on('mousemove', function(e) {
@@ -214,8 +212,10 @@
         var lon = e.latlng.lng.toFixed(6);
 
         // Coordenadas UTM y Zona/Uso
-        var utmDisplay = '';
-        if (typeof L.latLng !== 'undefined' && L.latLng(lat, lon).utm) {
+        var utmDisplay = 'UTM: No disponible'; // Mensaje por defecto
+        
+        // Comprobar si la función del plugin UTM está disponible
+        if (typeof L.latLng().utm === 'function') {
             var utm = L.latLng(lat, lon).utm();
             // Formatear las coordenadas UTM a 2 decimales
             var easting = utm.easting.toFixed(2);
@@ -224,10 +224,8 @@
             var utmZone = `${utm.zone}${utm.band}`;
             
             utmDisplay = `UTM: E: ${easting}, N: ${northing}<br>Zona/Uso: ${utmZone}`;
-        } else {
-            utmDisplay = 'UTM: No disponible'; // Mensaje de fallback si no se pueden calcular
         }
-
+        
         // Actualizar el contenido del div
         coordsDisplay.innerHTML = `Lat/Lon: ${lat}, ${lon}<br>${utmDisplay}`;
     });
