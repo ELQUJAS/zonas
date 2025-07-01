@@ -18,8 +18,14 @@
         padding: 0;
         margin: 0;
     }
+    
     .leaflet-control-layers-expanded {
-        font-size: 1.3em;
+        font-size: 1.7em !important;
+        transform: scale(1.3);
+        transform-origin: top right;
+    }
+    .leaflet-control-layers-tree label {
+        font-size: 1em !important;
     }
 
     #coordinate-display {
@@ -244,9 +250,7 @@
 
     var coordInput = document.getElementById('coord-input');
     var coordButton = document.getElementById('coord-button');
-    // --- VARIABLE PARA ALMACENAR EL MARCADOR ---
     var searchMarker;
-    // --- FIN DE LA VARIABLE ---
 
     coordButton.addEventListener('click', function() {
         var inputVal = coordInput.value.trim();
@@ -258,20 +262,25 @@
             
             map.setView([lat, lon], 15);
 
-            // --- CÓDIGO PARA AÑADIR/REEMPLAZAR EL MARCADOR ---
-            // Si ya existe un marcador, lo eliminamos
             if (searchMarker) {
                 map.removeLayer(searchMarker);
             }
-            // Creamos un nuevo marcador en la coordenada y lo añadimos al mapa
             searchMarker = L.marker([lat, lon]).addTo(map);
-            // Opcional: añadir un popup al marcador
             searchMarker.bindPopup(`<b>Coordenadas:</b><br>Lat: ${lat}, Lon: ${lon}`).openPopup();
-            // --- FIN DEL CÓDIGO ---
         } else {
             alert('Por favor, introduce las coordenadas en el formato correcto (ej: -39.300633 -72.292388)');
         }
     });
+
+    // --- CÓDIGO AÑADIDO PARA ELIMINAR EL MARCADOR AL BORRAR EL TEXTO ---
+    coordInput.addEventListener('input', function() {
+        if (coordInput.value.trim() === '') {
+            if (searchMarker) {
+                map.removeLayer(searchMarker);
+            }
+        }
+    });
+    // --- FIN DEL CÓDIGO AÑADIDO ---
     </script>
 </body>
 </html>
