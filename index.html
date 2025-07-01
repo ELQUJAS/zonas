@@ -128,7 +128,7 @@
     map.addLayer(layer_EsriSatellite_1);
 
     /* --- CÓDIGO MODIFICADO AQUÍ --- */
-    // La función del pop-up ahora solo tiene el texto en negrita y mayúsculas.
+    // La función del pop-up solo tiene el texto en negrita y mayúsculas.
     function pop_zonas_2(feature, layer) {
         var zonaName = feature.properties['Zona'];
         var popupContent = '<b>' + (zonaName !== null ? autolinker.link(zonaName.toLocaleString()).toUpperCase() : '').trim() + '</b>';
@@ -139,7 +139,7 @@
         layer.bindPopup(content, { maxHeight: 400 });
     }
 
-    // La función de estilo ahora asigna colores de relleno de la paleta de rojos.
+    // La función de estilo ahora asigna colores de relleno de la paleta de rojos y tiene 60% de transparencia.
     function style_zonas_2_0(feature) {
         // Se busca el índice de la característica en el GeoJSON para asignar un color
         var index = json_zonas_2.features.indexOf(feature);
@@ -147,14 +147,19 @@
 
         return {
             pane: 'pane_zonas_2',
-            opacity: 1,
-            color: 'rgba(35,35,35,0.705)',
+            // --- CÓDIGO MODIFICADO AQUÍ ---
+            // Se cambia la opacidad para que la capa sea 60% transparente (40% opaca).
+            opacity: 0.4, // Opacidad del borde del polígono
+            color: 'rgba(35,35,35,0.4)', // Opacidad del color del borde
+            // --- FIN DEL CÓDIGO MODIFICADO ---
             dashArray: '',
             lineCap: 'butt',
             lineJoin: 'miter',
             weight: 1.0,
             fill: true,
-            fillOpacity: 0.705, // Mantén la opacidad si lo deseas
+            // --- CÓDIGO MODIFICADO AQUÍ ---
+            fillOpacity: 0.4, // Opacidad del relleno del polígono
+            // --- FIN DEL CÓDIGO MODIFICADO ---
             fillColor: fillColor,
             interactive: true,
         }
