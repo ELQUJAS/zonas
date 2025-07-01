@@ -18,16 +18,34 @@
         padding: 0;
         margin: 0;
     }
-    /* --- CÓDIGO AÑADIDO PARA INCREMENTAR EL TAMAÑO DE LA LEYENDA --- */
     .leaflet-control-layers-expanded {
-        font-size: 1.3em; /* Aumenta el tamaño de la fuente un 30% (1.0 + 0.3) */
+        font-size: 1.3em;
+    }
+
+    /* --- CÓDIGO AÑADIDO PARA EL RECUADRO DE COORDENADAS --- */
+    #coordinate-display {
+        position: absolute;
+        bottom: 10px; /* Posiciona desde abajo */
+        left: 10px; /* Posiciona desde la izquierda */
+        z-index: 1000; /* Asegura que esté encima de todo */
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 8px;
+        border-radius: 5px;
+        font-family: sans-serif;
+        font-size: 14px;
+        color: #333;
+        line-height: 1.4;
+        min-width: 250px; /* Ancho mínimo para que no se vea cortado */
     }
     /* --- FIN DEL CÓDIGO AÑADIDO --- */
     </style>
     <title></title>
 </head>
 <body>
-    <div id="map">
+    <div id="map"></div>
+    <div id="coordinate-display">
+        Lat/Lon: <br>
+        UTM: <br>
     </div>
     <script src="js/qgis2web_expressions.js"></script>
     <script src="js/leaflet.js"></script>
@@ -40,22 +58,19 @@
     <script src="js/labelgun.min.js"></script>
     <script src="js/labels.js"></script>
     <script src="js/leaflet-search.js"></script>
+    <script src="js/leaflet.utm.js"></script>
     <script src="data/zonas_2.js"></script>
     <script>
-    /* --- CÓDIGO MODIFICADO AQUÍ --- */
-    // 1. Se define una paleta de colores rojos para los polígonos
     var redPalettePolygons = ['#ffe5e5', '#ffcccc', '#ff9999', '#ff6666', '#ff3333', '#ff0000', '#cc0000', '#990000', '#660000', '#330000'];
 
-    // Se elimina el fitBounds inicial con coordenadas fijas.
     var map = L.map('map', {
         zoomControl:false, maxZoom:28, minZoom:1
     });
-    /* --- FIN DEL CÓDIGO MODIFICADO --- */
 
     var hash = new L.Hash(map);
     map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
     var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
-    // remove popup's row if "visible-with-data"
+    
     function removeEmptyRowsFromPopupContent(content, feature) {
        var tempDiv = document.createElement('div');
        tempDiv.innerHTML = content;
@@ -69,13 +84,12 @@
        }
        return tempDiv.innerHTML;
     }
-    // add class to format popup if it contains media
-	function addClassToPopupIfMedia(content, popup) {
+    
+    function addClassToPopupIfMedia(content, popup) {
 		var tempDiv = document.createElement('div');
 		tempDiv.innerHTML = content;
 		if (tempDiv.querySelector('td img')) {
 			popup._contentNode.classList.add('media');
-				// Delay to force the redraw
 				setTimeout(function() {
 					popup.update();
 				}, 10);
@@ -83,22 +97,18 @@
 			popup._contentNode.classList.remove('media');
 		}
 	}
+    
     var zoomControl = L.control.zoom({
         position: 'topleft'
     }).addTo(map);
     var bounds_group = new L.featureGroup([]);
 
-    // --- CÓDIGO MODIFICADO AQUÍ ---
-    // Ahora esta función obtiene los límites de la capa y hace zoom a ellos.
     function setBounds() {
-        // Obtenemos los límites de la capa 'zonas'
         var bounds = layer_zonas_2.getBounds();
-        // Verificamos que los límites sean válidos antes de hacer zoom
         if (bounds.isValid()) {
             map.fitBounds(bounds);
         }
     }
-    // --- FIN DEL CÓDIGO MODIFICADO ---
 
     map.createPane('pane_OpenStreetMap_0');
     map.getPane('pane_OpenStreetMap_0').style.zIndex = 400;
@@ -127,8 +137,6 @@
     layer_EsriSatellite_1;
     map.addLayer(layer_EsriSatellite_1);
 
-    /* --- CÓDIGO MODIFICADO AQUÍ --- */
-    // La función del pop-up solo tiene el texto en negrita y mayúsculas.
     function pop_zonas_2(feature, layer) {
         var zonaName = feature.properties['Zona'];
         var popupContent = '<b>' + (zonaName !== null ? autolinker.link(zonaName.toLocaleString()).toUpperCase() : '').trim() + '</b>';
@@ -139,15 +147,12 @@
         layer.bindPopup(content, { maxHeight: 400 });
     }
 
-    // La función de estilo ahora asigna colores de relleno de la paleta de rojos y tiene 40% de transparencia.
     function style_zonas_2_0(feature) {
-        // Se busca el índice de la característica en el GeoJSON para asignar un color
         var index = json_zonas_2.features.indexOf(feature);
         var fillColor = redPalettePolygons && redPalettePolygons.length > 0 ? redPalettePolygons[index % redPalettePolygons.length] : 'rgba(255,245,240,0.6)';
 
         return {
             pane: 'pane_zonas_2',
-            // Se mantiene la opacidad al 60% (40% de transparencia).
             opacity: 0.6,
             color: 'rgba(35,35,35,0.6)',
             dashArray: '',
@@ -160,7 +165,6 @@
             interactive: true,
         }
     }
-    /* --- FIN DEL CÓDIGO MODIFICADO --- */
 
     map.createPane('pane_zonas_2');
     map.getPane('pane_zonas_2').style.zIndex = 402;
@@ -185,26 +189,41 @@
         {label: '<img src="legend/zonas_2.png" /> zonas', layer: layer_zonas_2},
     ];
     var lay = L.control.layers.tree(baseTree, overlaysTree,{
-        collapsed: false, // Se mantiene la leyenda
+        collapsed: false,
     });
     lay.addTo(map);
 
-    // --- CÓDIGO MODIFICADO AQUÍ ---
-    // Ahora, esta llamada ejecutará la función que hace zoom a la capa de zonas.
     setBounds();
-    // --- FIN DEL CÓDIGO MODIFICADO ---
 
     map.addControl(new L.Control.Search({
         layer: layer_zonas_2,
         initial: false,
         hideMarkerOnCollapse: true,
         propertyName: 'Zona',
-        // --- CÓDIGO AÑADIDO AQUÍ ---
-        zoom: 15 // Esto hace un zoom al nivel 15 cuando se selecciona una zona en el buscador
-        // --- FIN DEL CÓDIGO AÑADIDO ---
+        zoom: 15
     }));
-    document.getElementsByClassName('search-button')[0].className +=
-      ' fa fa-binoculars';
+    document.getElementsByClassName('search-button')[0].className += ' fa fa-binoculars';
+
+    /* --- CÓDIGO AÑADIDO PARA MOSTRAR COORDENADAS --- */
+    var coordsDisplay = document.getElementById('coordinate-display');
+    var isUTMEnabled = true; // Variable para habilitar/deshabilitar UTM
+
+    map.on('mousemove', function(e) {
+        // Coordenadas Lat/Lon
+        var lat = e.latlng.lat.toFixed(6);
+        var lon = e.latlng.lng.toFixed(6);
+
+        // Coordenadas UTM (si el plugin está disponible)
+        var utmCoords = '';
+        if (typeof L.latLng !== 'undefined' && L.latLng(lat, lon).utm) {
+            var utm = L.latLng(lat, lon).utm();
+            utmCoords = utm.toString({ format: '{x} {y} {zone}{band}' });
+        }
+
+        // Actualizar el contenido del div
+        coordsDisplay.innerHTML = `Lat/Lon: ${lat}, ${lon}<br>UTM: ${utmCoords}`;
+    });
+    /* --- FIN DEL CÓDIGO AÑADIDO --- */
     </script>
 </body>
 </html>
