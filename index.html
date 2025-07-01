@@ -18,6 +18,12 @@
             padding: 0;
             margin: 0;
         }
+        /* --- CÓDIGO MODIFICADO AQUÍ --- */
+        /* CSS para incrementar el tamaño de la leyenda en un 30% */
+        .leaflet-control-layers-expanded {
+            font-size: 1.3em; /* Aumenta el tamaño de la fuente un 30% (1.0 + 0.3) */
+        }
+        /* --- FIN DEL CÓDIGO MODIFICADO --- */
         </style>
         <title></title>
     </head>
@@ -167,7 +173,9 @@
             {label: '<img src="legend/zonas_2.png" /> zonas', layer: layer_zonas_2},
         ];
         var lay = L.control.layers.tree(baseTree, overlaysTree,{
-            collapsed: true,
+            // --- CÓDIGO MODIFICADO AQUÍ ---
+            collapsed: false, // Cambiado a 'false' para que la leyenda se mantenga abierta
+            // --- FIN DEL CÓDIGO MODIFICADO ---
         });
         lay.addTo(map);
 
