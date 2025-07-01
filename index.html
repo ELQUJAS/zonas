@@ -24,9 +24,15 @@
         transform: scale(1.3);
         transform-origin: top right;
     }
+
+    /* --- CÓDIGO MODIFICADO PARA ALINEAR SÍMBOLO Y TEXTO --- */
     .leaflet-control-layers-tree label {
         font-size: 1em !important;
+        display: flex;        /* Habilita Flexbox */
+        align-items: center;  /* Centra verticalmente los elementos (imagen y texto) */
+        gap: 10px;            /* Añade espacio entre el símbolo y el texto */
     }
+    /* --- FIN DEL CÓDIGO MODIFICADO --- */
 
     #coordinate-display {
         position: absolute;
@@ -272,7 +278,6 @@
         }
     });
 
-    // --- CÓDIGO AÑADIDO PARA ELIMINAR EL MARCADOR AL BORRAR EL TEXTO ---
     coordInput.addEventListener('input', function() {
         if (coordInput.value.trim() === '') {
             if (searchMarker) {
@@ -280,7 +285,6 @@
             }
         }
     });
-    // --- FIN DEL CÓDIGO AÑADIDO ---
     </script>
 </body>
 </html>
