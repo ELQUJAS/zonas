@@ -101,7 +101,6 @@
     <script src="js/leaflet-search.js"></script>
     <script src="data/zonas_2.js"></script>
     <script>
-    // PALETA DE COLORES MODIFICADA A AMARILLOS SUAVES
     var redPalettePolygons = ['#FFFBE6', '#FFF8CC', '#FFF5B3', '#FFF299', '#FFEF80', '#FFE64D', '#FFD900', '#FFCC00', '#E6B800', '#CCA300'];
     var map = L.map('map', {
         zoomControl:false, maxZoom:28, minZoom:1
@@ -201,11 +200,11 @@
         return {
             pane: 'pane_zonas_2',
             opacity: 0.6,
-            color: 'rgba(35,35,35,0.6)',
-            dashArray: '',
+            color: 'rgba(0,0,255,0.8)', // Color azul para el borde
+            dashArray: '5, 5',         // Línea punteada (5px de línea, 5px de espacio)
             lineCap: 'butt',
             lineJoin: 'miter',
-            weight: 1.0,
+            weight: 2.0,               // Un poco más de grosor para que se vea bien
             fill: true,
             fillOpacity: 0.6,
             fillColor: fillColor,
