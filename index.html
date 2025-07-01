@@ -76,32 +76,7 @@
         font-size: 14px;
     }
 
-    /* Estilos para las etiquetas de las zonas */
-    .zone-label {
-        font-weight: bold; /* Negrita */
-        font-size: 9px;    /* Tamaño de fuente más pequeño */
-        text-align: center;
-        white-space: nowrap;
-        color: #333;
-        /* Añadido buffer blanco con text-shadow */
-        text-shadow: 
-            -1px -1px 0 #FFF,  
-             1px -1px 0 #FFF,
-            -1px  1px 0 #FFF,
-             1px  1px 0 #FFF,
-             0px  0px 2px rgba(255,255,255,0.7); /* Sombra para mejorar la legibilidad */
-        pointer-events: none; /* Asegura que la etiqueta no bloquee eventos del mapa */
-    }
-    /* Asegurar que el marcador de la etiqueta se centre correctamente */
-    .leaflet-marker-icon.zone-label {
-        background: none !important; /* Eliminar el fondo por defecto si lo tiene */
-        border: none !important; /* Eliminar el borde por defecto si lo tiene */
-    }
-    /* Centrar el contenido del divIcon (el texto) */
-    .leaflet-marker-icon.zone-label div {
-        transform: translate(-50%, -50%); /* Centra el div del texto respecto al punto de anclaje del marcador */
-        position: relative; /* Necesario para que transform funcione correctamente */
-    }
+    /* Estilos para las etiquetas de las zonas (eliminados ya que las etiquetas se eliminan) */
     </style>
     <title></title>
 </head>
@@ -253,27 +228,27 @@
     bounds_group.addLayer(layer_zonas_2);
     map.addLayer(layer_zonas_2);
 
-    // --- CÓDIGO PARA ETIQUETAS FIJAS ---
-    var layer_zonas_2_labels = new L.featureGroup();
-    layer_zonas_2.eachLayer(function(layer) {
-        var centroid = layer.getBounds().getCenter();
-        var zonaName = layer.feature.properties['Zona'];
+    // --- CÓDIGO PARA ETIQUETAS FIJAS (ELIMINADO) ---
+    // var layer_zonas_2_labels = new L.featureGroup();
+    // layer_zonas_2.eachLayer(function(layer) {
+    //     var centroid = layer.getBounds().getCenter();
+    //     var zonaName = layer.feature.properties['Zona'];
 
-        if (zonaName) {
-            var labelIcon = L.divIcon({
-                className: 'zone-label',
-                html: '<div>' + zonaName + '</div>',
-                iconAnchor: [0, 0] // Centrar el icono en el marcador
-            });
+    //     if (zonaName) {
+    //         var labelIcon = L.divIcon({
+    //             className: 'zone-label',
+    //             html: '<div>' + zonaName + '</div>',
+    //             iconAnchor: [0, 0]
+    //         });
 
-            var labelMarker = L.marker(centroid, {
-                icon: labelIcon,
-                interactive: false,
-                pane: 'pane_zonas_2' // Asegura que las etiquetas estén en el mismo panel o superior
-            }).addTo(layer_zonas_2_labels); // Añadir al grupo de etiquetas
-        }
-    });
-    map.addLayer(layer_zonas_2_labels); // Añadir la capa de etiquetas directamente al mapa para que siempre sea visible
+    //         var labelMarker = L.marker(centroid, {
+    //             icon: labelIcon,
+    //             interactive: false,
+    //             pane: 'pane_zonas_2'
+    //         }).addTo(layer_zonas_2_labels);
+    //     }
+    // });
+    // map.addLayer(layer_zonas_2_labels); // Eliminado para que las etiquetas no aparezcan
 
     var baseMaps = {};
     var baseTree = [
