@@ -83,7 +83,13 @@
         text-align: center;
         white-space: nowrap;
         color: #333;
-        text-shadow: 1px 1px 2px rgba(255,255,255,0.7);
+        /* Añadido buffer blanco con text-shadow */
+        text-shadow: 
+            -1px -1px 0 #FFF,  
+             1px -1px 0 #FFF,
+            -1px  1px 0 #FFF,
+             1px  1px 0 #FFF,
+             0px  0px 2px rgba(255,255,255,0.7); /* Sombra para mejorar la legibilidad */
         pointer-events: none; /* Asegura que la etiqueta no bloquee eventos del mapa */
     }
     /* Asegurar que el marcador de la etiqueta se centre correctamente */
@@ -336,5 +342,3 @@
     </script>
 </body>
 </html>
-
-
