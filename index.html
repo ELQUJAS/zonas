@@ -78,16 +78,23 @@
 
     /* Estilos para las etiquetas de las zonas */
     .zone-label {
-        font-weight: bold; /* Aseguramos que sea negrita */
+        font-weight: bold; /* Negrita */
         font-size: 9px;    /* Tamaño de fuente más pequeño */
         text-align: center;
         white-space: nowrap;
         color: #333;
         text-shadow: 1px 1px 2px rgba(255,255,255,0.7);
         pointer-events: none; /* Asegura que la etiqueta no bloquee eventos del mapa */
-        position: absolute; /* Importante para el posicionamiento por JS */
-        transform: translate(-50%, -50%); /* Centrar el texto en el punto del marcador */
-        z-index: 600; /* Asegurar que estén por encima de los polígonos */
+    }
+    /* Asegurar que el marcador de la etiqueta se centre correctamente */
+    .leaflet-marker-icon.zone-label {
+        background: none !important; /* Eliminar el fondo por defecto si lo tiene */
+        border: none !important; /* Eliminar el borde por defecto si lo tiene */
+    }
+    /* Centrar el contenido del divIcon (el texto) */
+    .leaflet-marker-icon.zone-label div {
+        transform: translate(-50%, -50%); /* Centra el div del texto respecto al punto de anclaje del marcador */
+        position: relative; /* Necesario para que transform funcione correctamente */
     }
     </style>
     <title></title>
@@ -238,65 +245,27 @@
     bounds_group.addLayer(layer_zonas_2);
     map.addLayer(layer_zonas_2);
 
-    // --- INTEGRACIÓN DE LABELGUN PARA GESTIONAR LAS ETIQUETAS ---
-    // NO ES UNA CAPA DE LEAFLET, ES SOLO UN MANEJADOR DE VISIBILIDAD DE DOM ELEMENTS
-    var labelEngine = new labelGun(map); 
-    var labelsDomElements = []; // Almacenará los elementos DOM de las etiquetas
-
+    // --- CÓDIGO PARA ETIQUETAS FIJAS ---
+    var layer_zonas_2_labels = new L.featureGroup();
     layer_zonas_2.eachLayer(function(layer) {
+        var centroid = layer.getBounds().getCenter();
         var zonaName = layer.feature.properties['Zona'];
 
         if (zonaName) {
-            var labelDiv = L.DomUtil.create('div', 'zone-label'); 
-            labelDiv.innerHTML = zonaName;
-            
-            // Añadir el div al cuerpo del documento (invisible al principio)
-            // labelgun lo moverá y hará visible si cabe
-            document.body.appendChild(labelDiv); 
-
-            // Se necesita el punto del centroide y los límites del polígono en píxeles de pantalla
-            var centroidLatLng = layer.getBounds().getCenter();
-            var polygonLatLngBounds = layer.getBounds();
-
-            labelsDomElements.push({
-                label: labelDiv, // El elemento DOM de la etiqueta
-                centroid: centroidLatLng, // LatLng del centroide
-                polygonBounds: polygonLatLngBounds, // Bounds LatLng del polígono
-                minZoom: 1 // La etiqueta se muestra a partir de este zoom
+            var labelIcon = L.divIcon({
+                className: 'zone-label',
+                html: '<div>' + zonaName + '</div>',
+                iconAnchor: [0, 0] // Centrar el icono en el marcador
             });
+
+            var labelMarker = L.marker(centroid, {
+                icon: labelIcon,
+                interactive: false,
+                pane: 'pane_zonas_2' // Asegura que las etiquetas estén en el mismo panel o superior
+            }).addTo(layer_zonas_2_labels); // Añadir al grupo de etiquetas
         }
     });
-
-    // Función para procesar y mostrar las etiquetas con labelgun
-    function processLabels() {
-        labelEngine.clear(); // Limpia etiquetas anteriores
-        labelsDomElements.forEach(function(item) {
-            // Convierte el centroide y los límites del polígono a coordenadas de pantalla
-            var centroidPixel = map.latLngToContainerPoint(item.centroid);
-            var polygonPixelBounds = L.bounds(
-                map.latLngToContainerPoint(item.polygonBounds.getNorthWest()),
-                map.latLngToContainerPoint(item.polygonBounds.getSouthEast())
-            );
-
-            // Añadir la etiqueta a labelgun
-            // labelgun ajustará la posición de `item.label` y su visibilidad
-            labelEngine.addLabel(
-                item.label,               // El elemento DOM de la etiqueta
-                centroidPixel.x,          // X del centroide en píxeles
-                centroidPixel.y,          // Y del centroide en píxeles
-                item.polygonBounds,       // Los límites del polígono (LatLngBounds) para la contención
-                item.minZoom,             // Zoom mínimo para mostrar la etiqueta
-                false                     // false: no es un elemento móvil (dragable)
-            );
-        });
-        labelEngine.update(); // Actualiza la visualización de las etiquetas
-    }
-
-    map.on('moveend', processLabels); // Reprocesar etiquetas al final del movimiento/zoom
-    map.on('zoomend', processLabels); // Reprocesar etiquetas al final del zoom
-
-    // Llamar a processLabels una vez al inicio para la primera visualización
-    map.whenReady(processLabels); // Asegura que el mapa esté listo antes de procesar
+    map.addLayer(layer_zonas_2_labels); // Añadir la capa de etiquetas directamente al mapa para que siempre sea visible
 
     var baseMaps = {};
     var baseTree = [
@@ -304,14 +273,14 @@
         {label: "Esri Satellite", layer: layer_EsriSatellite_1},
     ];
     var overlaysTree = [
-        {label: '<img src="legend/zonas_2.png" /> zonas', layer: layer_zonas_2}, // Restaura la leyenda
+        {label: '<img src="legend/zonas_2.png" /> zonas', layer: layer_zonas_2}, // ¡Leyenda restaurada aquí!
     ];
     var lay = L.control.layers.tree(baseTree, overlaysTree,{
         collapsed: false,
     });
     lay.addTo(map);
 
-    setBounds(); // Llama a setBounds después de que las capas estén cargadas
+    setBounds();
 
     map.addControl(new L.Control.Search({
         layer: layer_zonas_2,
@@ -365,3 +334,4 @@
     </script>
 </body>
 </html>
+
