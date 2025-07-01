@@ -146,9 +146,11 @@
     function setBounds() {
         var bounds = layer_zonas_2.getBounds();
         if (bounds.isValid()) {
-            // Se usa fitBounds con la opción 'padding' para hacer un zoom más cercano
+            // map.fitBounds(bounds) ajusta el mapa a los límites de la capa.
+            // La opción 'padding' agrega un margen alrededor de los límites,
+            // lo que resulta en un zoom más cercano.
             map.fitBounds(bounds, {
-                padding: [50, 50] // Ajusta este valor en píxeles para cambiar el margen del zoom
+                padding: [100, 100] // Aumenta este valor para un zoom más cercano, redúcelo para ver más del área circundante.
             });
         }
     }
